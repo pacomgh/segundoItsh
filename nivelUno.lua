@@ -9,7 +9,8 @@
 composer = require "composer"
 scene = composer.newScene()
 widget = require "widget"
-
+physics = require "physics"
+physics.start( )
 
 function scene:create( event )
 
@@ -21,6 +22,20 @@ function scene:create( event )
 		end
 	end
 
+	function moveMines( self, event )
+		if (self.x < -50) then
+			self.x = 500
+			self.y = math.random( 90, 220 )
+			self.speed = math.random( 2, 6 )
+			self.amp = math.random( 20, 100 )
+			self.angle = math.random( 1, 360 )
+		else
+			self.x = self.x - self.speed
+			self.angle = self.angle + .1
+			self.y = self.amp+math.sin( self.angle )+self.initY
+		end
+	end
+
 	sceneGroup = self.view
 	--circle = display.newCircle( 100, 100, 12 )
 
@@ -29,15 +44,16 @@ function scene:create( event )
 	bg.anchorX, bg.anchorY = 0, 0
 
 	city1 = display.newImageRect( "assets/city1.png", 480, 228 )
-	city1.x, city1.y = 240, 210
-	city1.speed = 1
+	city1.x, city1.y = 240, 206
+	city1.speed = 1	
+
+	city3 = display.newImageRect( "assets/city1.png", 480, 228 )
+	city3.x, city3.y = 720, 206
+	city3.speed = 1
+
 	city2 = display.newImageRect( "assets/city2.png", 480, 102 )
 	city2.x, city2.y = 240, 280
 	city2.speed = 2
-
-	city3 = display.newImageRect( "assets/city1.png", 480, 228 )
-	city3.x, city3.y = 720, 210
-	city3.speed = 1
 
 	city4 = display.newImageRect( "assets/city2.png", 480, 102 )
 	city4.x, city4.y = 720, 280
@@ -46,11 +62,11 @@ function scene:create( event )
 	city1.enterFrame = scrollCity
 	Runtime:addEventListener( "enterFrame", city1 )
 
-	city2.enterFrame = scrollCity
-	Runtime:addEventListener( "enterFrame", city2 )
-
 	city3.enterFrame = scrollCity
 	Runtime:addEventListener( "enterFrame", city3)
+
+	city2.enterFrame = scrollCity
+	Runtime:addEventListener( "enterFrame", city2 )	
 
 	city4.enterFrame = scrollCity
 	Runtime:addEventListener( "enterFrame", city4 )
@@ -65,12 +81,27 @@ function scene:create( event )
 	jetSprite:play()
 
 
+
+	mine1 = display.newImageRect( "assets/mine.png", 49, 46 )
+	mine1.x, mine1.y = 500, 100
+	mine1.speed = math.random( 2, 6 )
+	mine1.initY = mine1.y
+	mine1.amp = math.random( 20, 100 )
+	mine1.angle = math.random( 1, 360 )
+	physics.addBody( mine1, "static", {density = .1, bounce = .1, friction = .2, radius = 12 })
+	sceneGroup:insert( mine1 )
+
+	mine1.enterFrame = moveMines
+	Runtime:addEventListener("enterFrame", mine1)
+
+
 	sceneGroup:insert( bg )
 	sceneGroup:insert( city1 )
-	sceneGroup:insert( city2 )
 	sceneGroup:insert( city3 )
+	sceneGroup:insert( city2 )	
 	sceneGroup:insert( city4 )
 	sceneGroup:insert( jetSprite )
+	sceneGroup:insert( mine1 )
 	
 
 end
